@@ -32,7 +32,7 @@
     border-radius: 16px;
     padding: 28px;
     width: 100%;
-    max-width: 420px;
+    max-width: 480px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.4);
   }
   h1 { font-size: 20px; margin: 0 0 4px; }
@@ -74,6 +74,17 @@
   }
   input[type=text]:focus { outline: 1px solid var(--accent); }
   .row { display: flex; gap: 10px; margin-top: 14px; }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+  }
+  .checkbox-row input { width: 16px; height: 16px; cursor: pointer; }
   button.main {
     flex: 1;
     border: none;
@@ -89,6 +100,7 @@
   .btn-call { background: var(--accent); color: white; }
   .btn-hangup { background: var(--danger); color: white; }
   .btn-mute { background: #2a2e38; color: var(--text); }
+  .btn-mute.active { background: var(--danger); color: white; }
   .status {
     margin-top: 18px;
     padding: 12px;
@@ -119,6 +131,96 @@
   }
   .incoming.show { display: block; }
   .incoming p { margin: 0 0 10px; font-size: 14px; }
+
+  .video-area {
+    margin-top: 16px;
+    position: relative;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+    aspect-ratio: 16 / 10;
+  }
+  .video-area.show { display: block; }
+  .video-area video#remoteVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #000;
+  }
+  .video-area video#localVideo {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 96px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.2);
+    transform: scaleX(-1);
+    background: #111;
+  }
+  .video-area.audio-only video#remoteVideo { display: none; }
+  .video-area.audio-only {
+    aspect-ratio: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .video-area.audio-only.show { display: flex; }
+  .video-area.no-local video#localVideo { display: none; }
+
+  .chat-panel {
+    margin-top: 16px;
+    border: 1px solid #2a2e38;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+  }
+  .chat-panel.show { display: block; }
+  .chat-messages {
+    height: 160px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #12141a;
+    font-size: 13px;
+  }
+  .msg { margin-bottom: 8px; max-width: 85%; }
+  .msg .bubble {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: #22262f;
+    word-break: break-word;
+  }
+  .msg.me { text-align: right; }
+  .msg.me .bubble { background: var(--accent); color: white; }
+  .msg .meta { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .msg a { color: inherit; text-decoration: underline; }
+  .chat-input-row {
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    background: #1a1d24;
+    border-top: 1px solid #2a2e38;
+  }
+  .chat-input-row input[type=text] {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .chat-input-row button {
+    border: none;
+    border-radius: 8px;
+    background: #2a2e38;
+    color: var(--text);
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  .chat-input-row button:hover { opacity: 0.85; }
+
   #log {
     margin-top: 14px;
     font-size: 11px;
@@ -147,10 +249,16 @@
       <input type="text" id="peerIdInput" placeholder="karşı tarafın ID'sini yapıştır">
     </div>
 
+    <label class="checkbox-row" for="videoCheckbox">
+      <input type="checkbox" id="videoCheckbox">
+      Kamerayı da aç (görüntülü arama)
+    </label>
+
     <div class="row">
       <button class="main btn-call" id="callBtn">Ara</button>
       <button class="main btn-hangup" id="hangupBtn" disabled>Kapat</button>
       <button class="main btn-mute" id="muteBtn" disabled>Sessiz</button>
+      <button class="main btn-mute" id="videoToggleBtn" disabled>Kamera</button>
     </div>
 
     <div class="incoming" id="incomingBox">
@@ -161,6 +269,21 @@
       </div>
     </div>
 
+    <div class="video-area" id="videoArea">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <video id="localVideo" autoplay playsinline muted></video>
+    </div>
+
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <button id="fileBtn" title="Dosya gönder">📎</button>
+        <input type="text" id="chatInput" placeholder="Mesaj yaz...">
+        <button id="sendBtn" title="Gönder">➤</button>
+      </div>
+      <input type="file" id="fileInput" style="display:none">
+    </div>
+
     <div class="status">
       <div class="dot connecting" id="statusDot"></div>
       <span id="statusText">Sinyal sunucusuna bağlanılıyor...</span>
@@ -168,8 +291,6 @@
 
     <div id="log"></div>
   </div>
-
-  <audio id="remoteAudio" autoplay playsinline></audio>
 
   <script src="vendor/peerjs.min.js"></script>
   <script src="app.js"></script>
