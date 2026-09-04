@@ -1,0 +1,15 @@
+{
+  "name": "basit-voip",
+  "version": "1.0.0",
+  "description": "Hesap gerektirmeyen basit VoIP masaüstü uygulaması",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^32.3.3"
+  },
+  "dependencies": {
+    "peerjs": "^1.5.5"
+  }
+}

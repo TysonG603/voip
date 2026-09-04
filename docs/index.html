@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basit VoIP</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --accent: #4f7cff;
+    --accent-dim: #2c3a66;
+    --danger: #e5484d;
+    --ok: #2ecc71;
+    --text: #e6e8ee;
+    --text-dim: #9aa0ac;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .card {
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--text-dim); font-size: 13px; margin-bottom: 20px; }
+  .field { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+  .id-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #12141a;
+    border: 1px solid #2a2e38;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .id-box code {
+    flex: 1;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    word-break: break-all;
+  }
+  button.copy {
+    background: transparent;
+    border: 1px solid #2a2e38;
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  input[type=text] {
+    width: 100%;
+    background: #12141a;
+    border: 1px solid #2a2e38;
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 15px;
+  }
+  input[type=text]:focus { outline: 1px solid var(--accent); }
+  .row { display: flex; gap: 10px; margin-top: 14px; }
+  button.main {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  button.main:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.main:hover:not(:disabled) { opacity: 0.9; }
+  .btn-call { background: var(--accent); color: white; }
+  .btn-hangup { background: var(--danger); color: white; }
+  .btn-mute { background: #2a2e38; color: var(--text); }
+  .status {
+    margin-top: 18px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #12141a;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .dot.connecting { background: #e5b84d; }
+  .dot.ready { background: var(--ok); }
+  .dot.ringing { background: var(--accent); animation: pulse 1s infinite; }
+  .dot.in-call { background: var(--ok); }
+  .dot.error { background: var(--danger); }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+  .incoming {
+    margin-top: 14px;
+    padding: 14px;
+    background: var(--accent-dim);
+    border-radius: 10px;
+    display: none;
+  }
+  .incoming.show { display: block; }
+  .incoming p { margin: 0 0 10px; font-size: 14px; }
+  #log {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    max-height: 90px;
+    overflow-y: auto;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Basit VoIP</h1>
+    <div class="sub">Hesap yok, kayıt yok. ID'ni paylaş, karşı taraf seni arasın.</div>
+
+    <div class="field">
+      <label>Senin ID'in (karşı tarafa gönder)</label>
+      <div class="id-box">
+        <code id="myId">bağlanıyor...</code>
+        <button class="copy" id="copyBtn">Kopyala</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Aramak istediğin ID</label>
+      <input type="text" id="peerIdInput" placeholder="karşı tarafın ID'sini yapıştır">
+    </div>
+
+    <div class="row">
+      <button class="main btn-call" id="callBtn">Ara</button>
+      <button class="main btn-hangup" id="hangupBtn" disabled>Kapat</button>
+      <button class="main btn-mute" id="muteBtn" disabled>Sessiz</button>
+    </div>
+
+    <div class="incoming" id="incomingBox">
+      <p id="incomingText">Gelen arama...</p>
+      <div class="row">
+        <button class="main btn-call" id="acceptBtn">Kabul Et</button>
+        <button class="main btn-hangup" id="rejectBtn">Reddet</button>
+      </div>
+    </div>
+
+    <div class="status">
+      <div class="dot connecting" id="statusDot"></div>
+      <span id="statusText">Sinyal sunucusuna bağlanılıyor...</span>
+    </div>
+
+    <div id="log"></div>
+  </div>
+
+  <audio id="remoteAudio" autoplay playsinline></audio>
+
+  <script src="vendor/peerjs.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
