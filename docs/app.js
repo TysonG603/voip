@@ -1,8 +1,13 @@
 // Basit VoIP - WebRTC (PeerJS) tabanlı, hesap/kayıt gerektirmeyen sesli/görüntülü arama + sohbet.
 // Sinyalleşme: PeerJS'in ücretsiz genel bulut sunucusu (0.peerjs.com) - hesap gerekmez.
-// NAT geçişi: Google'ın ücretsiz STUN sunucuları + Open Relay Project'in ücretsiz TURN sunucuları.
+// NAT geçişi: Google'ın ücretsiz STUN sunucuları (doğrudan P2P dener) + TURN röle sunucusu (varsa).
 // Sohbet/dosya: aynı P2P bağlantı üzerinden WebRTC DataChannel (PeerJS DataConnection), ekstra sunucu yok.
-
+//
+// IP gizleme notu: Doğrudan P2P modda karşı taraf senin gerçek IP adresini görebilir (WebRTC'nin
+// doğası gereği). Bunu kod içinde "zorla röle" yaparak çözmeyi denedik, ama tek hesapsız/ücretsiz
+// TURN seçeneğimiz (Open Relay Project) artık devre dışı - sağlayıcı hesap+API anahtarı zorunlu
+// hale getirdi. IP'ni gizlemek istiyorsan en güvenilir yol: bir VPN kullanmak (WebRTC sızıntı
+// koruması açık olmalı, aksi halde VPN'e rağmen gerçek IP ayrı bir ICE adayı olarak sızabilir).
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
@@ -13,11 +18,6 @@ const ICE_SERVERS = [
   },
   {
     urls: 'turn:openrelay.metered.ca:443',
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-  },
-  {
-    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
     username: 'openrelayproject',
     credential: 'openrelayproject',
   },
