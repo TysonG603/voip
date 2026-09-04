@@ -12,6 +12,7 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     title: 'Basit VoIP',
+    icon: path.join(__dirname, '..', 'build', 'icon.ico'),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

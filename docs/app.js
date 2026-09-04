@@ -202,7 +202,6 @@ function wireCall(call, withVideo) {
       localVideo.srcObject = localStream;
     }
     videoArea.className = 'video-area show' + (hasRemoteVideo ? '' : ' audio-only') + (hasLocalVideo ? '' : ' no-local');
-    if (!hasRemoteVideo) videoArea.textContent = '🎤 Sesli görüşme';
 
     setStatus('in-call', `Görüşme sürüyor: ${call.peer}`);
     callBtn.disabled = true;

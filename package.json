@@ -2,14 +2,37 @@
   "name": "basit-voip",
   "version": "1.0.0",
   "description": "Hesap gerektirmeyen basit VoIP masaüstü uygulaması",
+  "author": "TysonG603",
   "main": "electron/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
   },
   "devDependencies": {
-    "electron": "^32.3.3"
+    "electron": "^32.3.3",
+    "electron-builder": "^25.1.8",
+    "peerjs": "^1.5.5",
+    "png-to-ico": "^3.0.2"
   },
-  "dependencies": {
-    "peerjs": "^1.5.5"
+  "build": {
+    "appId": "com.basitvoip.app",
+    "productName": "Basit VoIP",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "docs/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "BasitVoIP-Portable.exe"
+    }
   }
 }
