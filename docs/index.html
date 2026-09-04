@@ -263,6 +263,40 @@
   .video-area.audio-only .audio-avatar, .video-area.audio-only .audio-label { display: flex; }
   .video-area.audio-only .audio-label { display: block; }
 
+  .safety-code {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(34, 197, 94, 0.10);
+    border: 1px solid rgba(34, 197, 94, 0.28);
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .safety-code.show { display: flex; animation: fadein 0.2s ease; }
+  .safety-code svg { width: 16px; height: 16px; color: var(--ok); flex-shrink: 0; }
+  .safety-code .txt { font-size: 11.5px; color: var(--text-dim); line-height: 1.4; }
+  .safety-code code {
+    display: block;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--ok);
+    margin-top: 1px;
+  }
+
+  .privacy-note {
+    margin-top: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.5;
+  }
+  .privacy-note svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; color: var(--text-faint); }
+
   .chat-panel {
     margin-top: 16px;
     border: 1px solid var(--border);
@@ -360,6 +394,11 @@
       <input type="text" id="peerIdInput" placeholder="karşı tarafın ID'sini yapıştır">
     </div>
 
+    <div class="field">
+      <label>Görüşme şifresi (opsiyonel — ikiniz de aynısını girin)</label>
+      <input type="text" id="passphraseInput" placeholder="boş bırakılırsa herkes arayabilir">
+    </div>
+
     <label class="checkbox-row" for="videoCheckbox">
       <input type="checkbox" id="videoCheckbox">
       Kamerayı da aç (görüntülü arama)
@@ -395,6 +434,14 @@
       <div class="audio-label">Sesli görüşme</div>
     </div>
 
+    <div class="safety-code" id="safetyCodeBox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="txt">
+        Güvenlik kodu — karşı tarafla sesli doğrula, eşleşmiyorsa görüşmeyi kapat
+        <code id="safetyCodeText">------</code>
+      </div>
+    </div>
+
     <div class="chat-panel" id="chatPanel">
       <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-row">
@@ -415,6 +462,11 @@
     </div>
 
     <div id="log"></div>
+
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Ses, görüntü ve mesajlar doğrudan cihazlar arasında uçtan uca şifrelenir (WebRTC/DTLS-SRTP); bu sayfa hiçbir görüşme, mesaj veya dosyayı herhangi bir sunucuda kaydetmez ya da saklamaz. Kaynak kodu açık — kontrol edebilirsin.</span>
+    </div>
   </div>
 
   <script src="vendor/peerjs.min.js"></script>
